@@ -1,4 +1,4 @@
-# Nystead for Teams (`nystead-teams` 0.8.1)
+# Nystead for Teams (`nystead-teams` 0.8.2)
 
 Nystead for Teams — the gated engineering workflow for people who write software: /new-project, /new-feature, /new-fix and /qa-check over business docs, domain model, design truth, architecture records, ticketing, TDD, review and the unattended chain. The skills are served by the Nystead server the plugin connects to on install; every question the workflow cannot answer from the canon is put to you. Free.
 
@@ -20,8 +20,15 @@ files the skills use (scripts, CLIs, checks) are written under this plugin's fol
 This repository is its own marketplace. Nystead Builder lives in its
 own repository the same way.
 
-Nothing to configure. Check the connection with `/mcp` — `nystead` is listed — and run
+Nothing to configure.
+
+Check the connection with `/mcp` — `nystead` is listed — and run
 `node "${CLAUDE_PLUGIN_ROOT}/scripts/skill.mjs" --list` from any session to see what is served.
+
+You install your own tools; the workflow expects Node, Git and graphify
+(`pip3 install "graphifyy[mcp]" --break-system-packages`), tmux for unattended runs, and Docker
+with MongoDB/Redis only for a project that stores data. Every conductor checks them and says which
+are missing.
 
 ## Money
 
