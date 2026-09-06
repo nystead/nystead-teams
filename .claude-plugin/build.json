@@ -1,0 +1,5 @@
+{
+  "build": "dev",
+  "plugin": "nystead-teams",
+  "version": "0.7.5"
+}

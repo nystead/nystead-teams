@@ -1,0 +1,9 @@
+# Written by the Nystead build. Do not edit.
+#
+# The runtime bundle a public install writes under this plugin root is not part of the plugin:
+# scripts/skill.mjs writes it on the first fetch and again when the version moves, and the build
+# deletes it whenever it rewrites this tree. Committing it would publish the canon's runnable files.
+.nystead-runtime
+/skills/*/scripts/
+/skills/*/cli/
+/skills/*/assets/

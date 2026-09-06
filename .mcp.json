@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "nystead": {
+      "type": "http",
+      "url": "https://mcp.nystead.com/mcp",
+      "headers": {
+        "Authorization": "Bearer a8f43a6b287b0ae344e3a12253a984dd10585f016440b9def3f226044147054a"
+      }
+    }
+  }
+}
