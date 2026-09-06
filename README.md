@@ -1,4 +1,4 @@
-# Nystead for Teams (`nystead-teams` 0.8.5)
+# Nystead for Teams (`nystead-teams` 0.8.6)
 
 Nystead for Teams — the gated engineering workflow for people who write software: /new-project, /new-feature, /new-fix and /qa-check over business docs, domain model, design truth, architecture records, ticketing, TDD, review and the unattended chain. The skills are served by the Nystead server the plugin connects to on install; every question the workflow cannot answer from the canon is put to you. Free.
 

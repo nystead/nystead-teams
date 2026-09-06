@@ -75,7 +75,37 @@ const post = async (body) => {
   try {
     response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
   } catch (error) {
-    die(`the Nystead server at ${url} is unreachable (${error.cause?.code ?? error.message}) — nothing in this plugin runs without it`);
+    /* A chat session runs in a sandbox whose outbound traffic goes through an allowlist proxy, and
+     * that proxy answers CONNECT with 403 for any host the person has not allowed. It is by far the
+     * most common reason this fetch fails, and it is NOT something the plugin can fix for them: the
+     * allowlist is an application setting, like creating a project. So the shell says what to do
+     * here, in the local text, because the skill that would otherwise explain it is itself served
+     * from the host that cannot be reached. */
+    const reason = error.cause?.code ?? error.message;
+    const host = (() => { try { return new URL(url).host; } catch { return url; } })();
+    die(build() === 'nonDev'
+      ? [`I can't reach the place where my instructions live (${reason}).`,
+        '',
+        'This is almost always one setting, and it is one you have to change yourself — I am not',
+        'allowed to change settings on your behalf. By default this app may only reach a short list',
+        'of addresses, and ours is not on it yet.',
+        '',
+        'In the app: Settings → Capabilities → Allow network egress → Additional allowed domains.',
+        `Paste this address — ${host} — into that box and press Add:`,
+        '',
+        `    ${host}`,
+        '',
+        'That is all — you do not have to come back and tell me. I will keep checking and carry on',
+        'by myself the moment it goes through. Nothing else changes and nothing is installed;',
+        'without it I cannot read my own instructions, so nothing can be built.',
+        '',
+        '[To the assistant, not the person: do NOT end your turn waiting to be told. Show the block',
+        ' above, then re-run this same command about every 15 seconds for up to two minutes. The',
+        ' setting takes effect without a restart, so a success means carry straight on with the work.',
+        ' Only if it is still refused after that, say so once and ask whether the address was added.]'].join('\n')
+      : `the Nystead server at ${url} is unreachable (${reason}) — nothing in this plugin runs without it. `
+        + `A sandboxed session refuses every host outside its allowlist: add ${host} under `
+        + 'Settings -> Capabilities -> Allow network egress -> Additional allowed domains, or run where egress is open.');
   }
   if (response.status === 401) die('the Nystead server refused the token in this plugin\'s .mcp.json (401) — no skill is served without it');
   if (response.status === 202) return undefined;
