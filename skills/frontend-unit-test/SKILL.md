@@ -3,7 +3,7 @@ name: frontend-unit-test
 description: >
   Write unit and component tests FIRST — they are the source of truth. Step 0 of the
   frontend pipeline (frontend-unit-test → frontend-development → frontend-code-review) for
-  every chunk, fix and new feature in React/TypeScript repos. Jest + Testing Library canon,
+  every chunk, fix and new feature in React/TypeScript repos. Vitest + Testing Library canon,
   the request-module mock seam, behaviour-only assertions, one test clause per `AC-n`, and
   the one-time repo bootstrap.
   Triggers on: write tests, unit test, component test, TDD, test first, add coverage.

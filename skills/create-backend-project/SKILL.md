@@ -4,8 +4,8 @@ description: >
   Scaffold a new company backend service: clean-architecture Express/TypeScript
   (‹redacted› canon) with zod request validation, usecase classes, repository
   seam, StatusError flow, winston logging, jest+ts-jest+supertest tests, and the
-  scaffold-shipped checks wired into lint — with flags for mongo, redis, cron, events,
-  Socket.IO, and helm deploy. Runs via the bundled node CLI or by Claude applying the same
+  scaffold-shipped checks wired into lint — with flags for mongo, redis, cron, events, and
+  Socket.IO. Runs via the bundled node CLI or by Claude applying the same
   templates. Triggers on: new backend, new service, scaffold api, create rest service.
 ---
 

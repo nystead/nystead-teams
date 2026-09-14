@@ -33,7 +33,7 @@ const connection = () => {
   if (!existsSync(path)) die(`${path} is missing — this plugin cannot reach its server`);
   const servers = JSON.parse(readFileSync(path, 'utf8')).mcpServers ?? {};
   const server = servers.nystead ?? Object.values(servers)[0];
-  const url = process.env.DECISION_MEMORY_URL || server?.url;
+  const url = process.env.DECISION_MEMORY_MCP_URL || process.env.DECISION_MEMORY_URL || server?.url;
   const token = process.env.DECISION_MEMORY_AUTH_TOKEN
     || (server?.headers?.Authorization ?? '').replace(/^Bearer\s+/, '');
   if (!url || !token) die('.mcp.json declares no url or no bearer token for the nystead server');
