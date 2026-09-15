@@ -4,6 +4,7 @@
 # scripts/skill.mjs writes it on the first fetch and again when the version moves, and the build
 # deletes it whenever it rewrites this tree. Committing it would publish the canon's runnable files.
 .nystead-runtime
+nystead-runtime.env
 /skills/*/scripts/
 /skills/*/cli/
 /skills/*/assets/

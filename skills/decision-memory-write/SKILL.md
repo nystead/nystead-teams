@@ -2,7 +2,7 @@
 name: decision-memory-write
 description: >
   Write to Decision Memory — two moments only. (1) In non-dev, when decision-memory-read missed and
-  Claude decided a technical question from the canon: record it in the pending queue with the
+  the AI decided a technical question from the canon: record it in the pending queue with the
   question as asked, the options, the choice, the reason and the artefact, and continue. (2) At
   review, when the human approves or amends pending entries into memory. Triggers on: record
   decision, pending queue, source: claude, approve decision, review pending, R-M07, R-M02.

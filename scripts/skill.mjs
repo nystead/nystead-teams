@@ -10,8 +10,16 @@
  *
  * Text is printed and never written; the runnable files (scripts, CLIs, assets) are written under
  * this plugin's root the first time any entry is fetched and again whenever their bundle version
- * moves, so every `${CLAUDE_PLUGIN_ROOT}/skills/…` path a served skill names resolves on disk.
+ * moves, so every path a served skill names resolves on disk.
  * The server URL and token come from this plugin's own .mcp.json — nothing to configure.
+ *
+ * THIS FILE IS THE WRAPPER. The served text and the runnable files are the core, and the core
+ * names no coding AI: it says `${NYSTEAD_PLUGIN_ROOT}` for the plugin's root and reads the
+ * runner's facts from `<root>/nystead-runtime.env`. This shell is the Claude Code adapter of
+ * that contract — it substitutes the root when it prints, and it writes the env file from what
+ * it knows about its own runner (the CLI, its headless flags, the build flag in
+ * .claude-plugin/build.json). A wrapper for another coding AI replaces this file and nothing
+ * else.
  */
 import { execFileSync } from 'node:child_process';
 import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -44,6 +52,38 @@ const build = () => {
   const path = join(root, '.claude-plugin', 'build.json');
   try { return JSON.parse(readFileSync(path, 'utf8')).build ?? 'dev'; } catch { return 'dev'; }
 };
+
+/* The runner contract, written for the core's scripts (chain-init, preflight, question-gate,
+ * decision-memory-read) and for anything that runs outside a session, such as a tmux chain that
+ * inherits nothing. Every value here is a fact about THIS wrapper's runner; the core only reads. */
+const RUNTIME_ENV = 'nystead-runtime.env';
+/* The runner's facts come from the server's `get_runner` — the adapter behind this shell's path
+ * knows what this coding AI is and does; the shell hardcodes nothing about itself. A server that
+ * predates runners has no such tool, and the values below are what it would have answered. */
+const FALLBACK_PROFILE = {
+  runner: 'claude-code',
+  ai: { cmd: 'claude -p', flags: '--dangerously-skip-permissions --output-format text', modelFlag: '--model' },
+};
+const writeRuntimeEnv = async () => {
+  let profile = FALLBACK_PROFILE;
+  try { profile = await call('get_runner', {}); } catch { /* older server */ }
+  const q = (v) => `'${String(v ?? '').replace(/'/g, "'\\''")}'`;
+  const lines = [
+    '# written by the plugin shell on every fetch — the runner facts the core reads; do not edit',
+    `NYSTEAD_RUNNER=${profile.runner}`,
+    `NYSTEAD_BUILD=${build()}`,
+    `NYSTEAD_PLUGIN_ROOT=${root}`,
+    `NYSTEAD_AI_CMD=${q(profile.ai?.cmd)}`,
+    `NYSTEAD_AI_FLAGS=${q(profile.ai?.flags)}`,
+    `NYSTEAD_AI_MODEL_FLAG=${q(profile.ai?.modelFlag)}`,
+    '',
+  ];
+  try { writeFileSync(join(root, RUNTIME_ENV), lines.join('\n')); } catch { /* read-only plugin dir: the core falls back to its defaults */ }
+};
+
+/* The core says `${NYSTEAD_PLUGIN_ROOT}`; the person reading the printed text in a Claude Code
+ * session needs a path that resolves in a Bash tool call, so the wrapper substitutes it here. */
+const adapt = (text) => text.replaceAll('${NYSTEAD_PLUGIN_ROOT}', root).replaceAll('${CLAUDE_PLUGIN_ROOT}', root); // the second is this runner's own name for it, kept for text served before the core went neutral
 
 /* One conversation = one Claude Code process. A Bash tool call is a shell whose parent is that
  * process, so its pid names the conversation; NYSTEAD_SESSION overrides it where that is not so. */
@@ -167,7 +207,8 @@ const main = async () => {
     const file = await call('get_skill', { skill: name, build: build(), file: value('file') });
     if (!file.found) die(`the server does not serve \`${name}\``);
     if (file.fileMissing) die(`\`${name}\` has no text file ${value('file')} — a runnable file is on disk under ${root}`);
-    process.stdout.write(file.text.endsWith('\n') ? file.text : `${file.text}\n`);
+    const text = adapt(file.text);
+    process.stdout.write(text.endsWith('\n') ? text : `${text}\n`);
     return;
   }
 
@@ -176,6 +217,7 @@ const main = async () => {
   const skill = await call('get_skill', { skill: name, build: build(), knownVersion: known });
   if (!skill.found) die(`the server does not serve \`${name}\``);
   await materialiseRuntime(flag('fresh'));
+  await writeRuntimeEnv();
   if (skill.unchanged) {
     process.stdout.write(`cached: \`${name}\` version ${skill.version} was fetched earlier in this conversation and is unchanged — the text already in the conversation stands (run with --fresh to print it again)\n`);
     return;
@@ -184,7 +226,8 @@ const main = async () => {
   writeCache(cache);
   const files = skill.textFiles.length ? ` · text files: ${skill.textFiles.join(', ')} (read with --file)` : '';
   process.stdout.write(`<!-- nystead: ${skill.kind} \`${name}\` version ${skill.version}${files} -->\n`);
-  process.stdout.write(skill.text.endsWith('\n') ? skill.text : `${skill.text}\n`);
+  const text = adapt(skill.text);
+  process.stdout.write(text.endsWith('\n') ? text : `${text}\n`);
 };
 
 main().catch((error) => die(String(error?.message ?? error)));

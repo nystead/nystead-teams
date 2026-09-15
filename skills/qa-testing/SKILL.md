@@ -3,7 +3,7 @@ name: qa-testing
 description: >
   Verify the RUNNING product against the documented truth — docs/business flows and
   BR-numbered rules, feature design records, the design place of truth, and every decision
-  Claude made instead of a human — by driving a real browser with Claude in Chrome.
+  the AI made instead of a human — by driving a real browser with the browser the wrapper provides.
   Flow-by-flow protocol with screenshot evidence, BR-mapped failures, and a QA report that
   feeds the F-loop. Triggers on: qa, test the app, verify flows, check the site, smoke test,
   regression check, walk the flows.

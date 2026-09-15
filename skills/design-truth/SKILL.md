@@ -6,7 +6,7 @@ description: >
   and the business logic it owns — plus one shell record for what renders before any page (the
   opening of a session, its refusal). Then check every design against it: an existing Figma is
   measured against the truth and its gaps named, a missing design is drawn from the truth with
-  Claude Design, and a client who dislikes how it looks gets a LOOK change, never a concept change.
+  the design canvas, and a client who dislikes how it looks gets a LOOK change, never a concept change.
   Design and coverage are cut and measured one release step at a time, never all at once, with what
   a step does not carry preserved rather than dropped. Anything drawn that is in no flow and no
   rule is a product park. Triggers on: design intake, what pages do we need, check the figma, no

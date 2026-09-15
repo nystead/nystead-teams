@@ -2,7 +2,7 @@
 name: getting-started
 description: >
   Take a person from a freshly installed plugin to a working environment and the first real
-  step of their project — the Claude project, the session instruction, terminal access, and
+  step of their project — the project workspace in the assistant app, the session instruction, terminal access, and
   each tool the work actually needs — asking permission before every change to their machine
   and saying in one sentence why it is needed. In a `nonDev` build this REPLACES the toolchain
   check every conductor runs, because "install graphify and restart the session" is the wall a
