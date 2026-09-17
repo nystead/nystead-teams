@@ -188,6 +188,12 @@ const materialiseRuntime = async (force = false) => {
   process.stderr.write(`nystead: ${runtime.files.length} runnable files written under ${root} (runtime ${runtime.version})\n`);
 };
 
+/* The server may hold an entry of a kind this runner has no shape for — a slash command reaching a
+ * runner that has none. It answers `notEmitted` with the reason, and the shell says so rather than
+ * printing an empty text: an absence and a blank fetch must never look the same. */
+const notEmitted = (entry, answer) =>
+  `\`${entry}\` is a ${answer.kind} and this runner does not take that kind — ${answer.reason}`;
+
 const main = async () => {
   if (flag('list')) {
     const page = await call('list_skills', { page: 1, pageSize: 100 });
@@ -206,6 +212,7 @@ const main = async () => {
   if (value('file')) {
     const file = await call('get_skill', { skill: name, build: build(), file: value('file') });
     if (!file.found) die(`the server does not serve \`${name}\``);
+    if (file.notEmitted) die(notEmitted(name, file));
     if (file.fileMissing) die(`\`${name}\` has no text file ${value('file')} — a runnable file is on disk under ${root}`);
     const text = adapt(file.text);
     process.stdout.write(text.endsWith('\n') ? text : `${text}\n`);
@@ -216,6 +223,7 @@ const main = async () => {
   const known = flag('fresh') ? undefined : cache.skills?.[name];
   const skill = await call('get_skill', { skill: name, build: build(), knownVersion: known });
   if (!skill.found) die(`the server does not serve \`${name}\``);
+  if (skill.notEmitted) die(notEmitted(name, skill));
   await materialiseRuntime(flag('fresh'));
   await writeRuntimeEnv();
   if (skill.unchanged) {
