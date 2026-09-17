@@ -62,7 +62,7 @@ const RUNTIME_ENV = 'nystead-runtime.env';
  * predates runners has no such tool, and the values below are what it would have answered. */
 const FALLBACK_PROFILE = {
   runner: 'claude-code',
-  ai: { cmd: 'claude -p', flags: '--dangerously-skip-permissions --output-format text', modelFlag: '--model' },
+  ai: { cmd: 'claude -p', flags: '--dangerously-skip-permissions --output-format json', modelFlag: '--model' },
 };
 const writeRuntimeEnv = async () => {
   let profile = FALLBACK_PROFILE;
