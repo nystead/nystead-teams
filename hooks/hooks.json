@@ -1,0 +1,13 @@
+{
+  "description": "Nystead guard: while a Nystead conductor runs, the host's own document and app surfaces never make the product.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Artifact|ArtifactData|Skill|mcp__Claude_Docs__.*",
+        "hooks": [
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/guard.mjs\"", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}

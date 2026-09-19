@@ -57,6 +57,16 @@ const build = () => {
  * decision-memory-read) and for anything that runs outside a session, such as a tmux chain that
  * inherits nothing. Every value here is a fact about THIS wrapper's runner; the core only reads. */
 const RUNTIME_ENV = 'nystead-runtime.env';
+/* Where this session runs -- a fact about the runner's host, so the shell says it and the core only
+ * reads it. `orchestrator`: the desktop assistant app that orchestrates and reaches the
+ * person's computer through its link. `local`: the coding AI the person started on their own
+ * computer, whose shell IS their computer. `remote`: anything else -- a cloud sandbox with no road
+ * to their computer, or a plain chat -- which the core moves to the orchestrator. */
+const host = () => {
+  if (process.env.CLAUDE_CODE_ENTRYPOINT === 'remote_cowork') return 'orchestrator';
+  if (process.env.CLAUDECODE === '1' && process.env.CLAUDE_CODE_REMOTE !== 'true') return 'local';
+  return 'remote';
+};
 /* The runner's facts come from the server's `get_runner` — the adapter behind this shell's path
  * knows what this coding AI is and does; the shell hardcodes nothing about itself. A server that
  * predates runners has no such tool, and the values below are what it would have answered. */
@@ -72,6 +82,7 @@ const writeRuntimeEnv = async () => {
     '# written by the plugin shell on every fetch — the runner facts the core reads; do not edit',
     `NYSTEAD_RUNNER=${profile.runner}`,
     `NYSTEAD_BUILD=${build()}`,
+    `NYSTEAD_HOST=${host()}`,
     `NYSTEAD_PLUGIN_ROOT=${root}`,
     `NYSTEAD_AI_CMD=${q(profile.ai?.cmd)}`,
     `NYSTEAD_AI_FLAGS=${q(profile.ai?.flags)}`,
@@ -233,7 +244,7 @@ const main = async () => {
   cache.skills = { ...(cache.skills ?? {}), [name]: skill.version };
   writeCache(cache);
   const files = skill.textFiles.length ? ` · text files: ${skill.textFiles.join(', ')} (read with --file)` : '';
-  process.stdout.write(`<!-- nystead: ${skill.kind} \`${name}\` version ${skill.version}${files} -->\n`);
+  process.stdout.write(`<!-- nystead: ${skill.kind} \`${name}\` version ${skill.version}${files} · host: ${host()} -->\n`);
   const text = adapt(skill.text);
   process.stdout.write(text.endsWith('\n') ? text : `${text}\n`);
 };
